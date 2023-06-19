@@ -20,7 +20,7 @@ pub use event_data::*;
 use hex::{decode, encode};
 use prisma::event;
 use prisma::PrismaClient;
-use prisma_client_rust::{serde_json, NewClientError};
+use prisma_client_rust::{serde_json, NewClientError, QueryError};
 use serde::{Deserialize, Serialize};
 
 use crate::sign::{create_event_sig, verify_event_sig};
@@ -102,7 +102,10 @@ async fn main() -> std::io::Result<()> {
     .await
 }
 
-pub async fn save_event(client: &PrismaClient, event: EventData) -> Result<(), NewClientError> {
+pub async fn save_event(
+    client: &PrismaClient,
+    event: EventData,
+) -> Result<event::Data, QueryError> {
     let tags = serde_json::to_string(&event.tags).unwrap();
 
     let saved_event = client
@@ -119,7 +122,7 @@ pub async fn save_event(client: &PrismaClient, event: EventData) -> Result<(), N
         .exec()
         .await;
     println!("Saved event: {:?}", saved_event);
-    Ok(())
+    saved_event
 }
 
 //impl to_string for EventData return a json compatible string

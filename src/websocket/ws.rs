@@ -1,7 +1,22 @@
 /// Define HTTP actor
 use crate::*;
 use actix::AsyncContext;
+use actix::Handler;
+use actix::Message;
 use serde_json::Value;
+#[derive(Message)]
+#[rtype(result = "()")]
+pub(crate) struct ReplyMessage(pub String);
+
+impl Handler<ReplyMessage> for MyWs {
+    type Result = ();
+
+    fn handle(&mut self, msg: ReplyMessage, ctx: &mut Self::Context) -> Self::Result {
+        // Process the reply message here
+        ctx.text(msg.0);
+    }
+}
+
 pub struct MyWs {
     pub client: Arc<PrismaClient>,
 }
@@ -36,15 +51,20 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
                         println!("Received event: {:?}", event);
                         let event_string = json_stringify(&event);
                         let client = self.client.clone();
+                        let addr = ctx.address().clone();
                         let fut = async move {
                             let res = save_event(&client, event.clone()).await;
-                            /*   let _ = ctx.address().do_send(Text(format!(
-                                "Requested Saved event: {:?}",
-                                "event_string"
-                            ))); */
+
                             match res {
-                                Ok(_) => println!("Saved event: {:?}", event.clone()),
-                                Err(e) => println!("Error saving event: {:?}", e),
+                                Ok(_) => {
+                                    addr.do_send(ReplyMessage(format!(
+                                        "Saved event: {:?}",
+                                        json_stringify(&event)
+                                    )));
+                                }
+                                Err(e) => {
+                                    addr.do_send(ReplyMessage(format!("Error: {:?}", e)));
+                                }
                             }
                         };
 
