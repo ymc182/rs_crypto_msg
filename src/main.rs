@@ -1,13 +1,18 @@
+use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 use secp256k1::hashes::sha256;
+use secp256k1::rand::rngs::OsRng;
 use secp256k1::schnorr::Signature;
 use secp256k1::{KeyPair, Message, Secp256k1, XOnlyPublicKey};
+
 #[allow(warnings, unused)]
 mod prisma;
+use actix_web::web::Json;
 use hex::{decode, encode};
 use prisma::event;
 use prisma::PrismaClient;
 use prisma_client_rust::{serde_json, NewClientError};
-#[derive(Debug)]
+use serde::{Deserialize, Serialize};
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct EventData {
     pub id: String,
     pub pubkey: String,
@@ -17,14 +22,58 @@ pub struct EventData {
     pub sig: String,
 }
 
-#[tokio::main]
-async fn main() {
+#[get("/")]
+async fn hello() -> impl Responder {
+    HttpResponse::Ok().body("Hello world!")
+}
+
+#[post("/echo")]
+async fn echo(req_body: String) -> impl Responder {
+    HttpResponse::Ok().body(req_body)
+}
+
+#[post("/create-event")]
+async fn create_event(req_body: Json<EventData>) -> impl Responder {
+    let event_data = req_body.into_inner();
+    let is_verified = verify_event_sig(&event_data);
+    if !is_verified {
+        return HttpResponse::BadRequest().body("Invalid signature");
+    }
+    HttpResponse::Ok().body("Event created")
+}
+
+#[get("/key-pair")]
+async fn create_key_pair() -> impl Responder {
+    let secp = Secp256k1::new();
+    let (secret_key, public_key) = secp.generate_keypair(&mut OsRng);
+    let secret_key_hex = secret_key.display_secret().to_string();
+    let public_key_hex = public_key.to_string()[2..].to_string();
+    let key_pair = serde_json::json!({
+            "secret_key": secret_key_hex,
+            "public_key": public_key_hex,
+    });
+    HttpResponse::Ok().body(key_pair.to_string())
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
     let _client: PrismaClient = PrismaClient::_builder()
         .build()
         .await
         .expect("Failed to build client");
 
     println!("Client Created");
+    println!("Server running at http://{}:{}", "localhost", "8080");
+    HttpServer::new(|| {
+        App::new().service(hello).service(echo).service(
+            web::scope("/api")
+                .service(create_event)
+                .service(create_key_pair),
+        )
+    })
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
 }
 
 pub async fn save_event(client: PrismaClient, event: EventData) -> Result<(), NewClientError> {
@@ -76,10 +125,11 @@ pub fn create_event_sig(
 
 pub fn verify_event_sig(event: &EventData) -> bool {
     let secp = Secp256k1::new();
-    let pubkey_str = event.pubkey.clone();
+
+    let pubkey_str = "02".to_string() + &event.pubkey.clone();
     let pubkey_bytes = decode(&pubkey_str).expect("Failed to decode pubkey");
     let pubkey = secp256k1::PublicKey::from_slice(&pubkey_bytes).unwrap();
-    let xonly_pubkey = XOnlyPublicKey::from(pubkey);
+    let x_only_pubkey = XOnlyPublicKey::from(pubkey);
     let tags = serde_json::to_string(&event.tags).unwrap();
 
     let id = serde_json::json!([0, event.pubkey, event.created_at, tags, event.content]);
@@ -90,7 +140,7 @@ pub fn verify_event_sig(event: &EventData) -> bool {
     let sig_bytes = decode(&event.sig).expect("Failed to decode signature");
     let sig = Signature::from_slice(&sig_bytes).unwrap();
 
-    let ver_result = secp.verify_schnorr(&sig, &message, &xonly_pubkey);
+    let ver_result = secp.verify_schnorr(&sig, &message, &x_only_pubkey);
     if ver_result.is_err() {
         return false;
     }

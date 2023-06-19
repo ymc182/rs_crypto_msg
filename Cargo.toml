@@ -12,6 +12,7 @@ prisma-client-rust = { git = "https://github.com/Brendonovich/prisma-client-rust
 serde = "1.0.164"
 tokio = "1.28.2"
 hex = "0.4.3"
+actix-web = "4"
 
 [workspace]
 members = [
