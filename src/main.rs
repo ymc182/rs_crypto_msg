@@ -67,7 +67,7 @@ async fn create_key_pair() -> impl Responder {
     let secp = Secp256k1::new();
     let (secret_key, public_key) = secp.generate_keypair(&mut OsRng);
     let secret_key_hex = secret_key.display_secret().to_string();
-    let public_key_hex = public_key.to_string();
+    let public_key_hex = public_key.to_string()[2..].to_string(); // remove 02/03 prefix
     let key_pair = serde_json::json!({
             "secret_key": secret_key_hex,
             "public_key": public_key_hex,
@@ -136,7 +136,7 @@ pub fn create_event_sig(
     let sig_encoded = encode(sig.as_ref());
     return EventData {
         id: id_hashed,
-        pubkey,
+        pubkey: pubkey[2..].to_string(), // remove 02 prefix
         created_at,
         content,
         tags,
@@ -146,14 +146,37 @@ pub fn create_event_sig(
 
 pub fn verify_event_sig(event: &EventData) -> bool {
     let secp = Secp256k1::new();
+    //check pubkey without prefix is odd or even
 
-    let pubkey_str = &event.pubkey.clone();
-    let pubkey_bytes = decode(&pubkey_str).expect("Failed to decode pubkey");
-    let pubkey = secp256k1::PublicKey::from_slice(&pubkey_bytes).unwrap();
-    let x_only_pubkey = XOnlyPublicKey::from(pubkey);
+    let original_pubkey = &event.pubkey.clone();
+
+    let is_odd = original_pubkey
+        .chars()
+        .last()
+        .unwrap()
+        .to_digit(16)
+        .unwrap()
+        % 2
+        == 1;
+    let pubkey_with_prefix: String = if is_odd {
+        "02".to_string() + &original_pubkey
+    } else {
+        "03".to_string() + &original_pubkey
+    };
+
+    println!("pubkey_with_prefix: {}", pubkey_with_prefix);
+    // println!("pubkey_str: {}", pubkey_str);
+    let pubkey_bytes = decode(&pubkey_with_prefix).expect("Failed to decode pubkey");
+    let pubkey_prefix_bytes = decode(&pubkey_with_prefix).expect("Failed to decode pubkey");
+
+    // println!("pubkey_bytes: {:?}", pubkey_bytes);
+    println!("pubkey_prefix_bytes: {:?}", pubkey_prefix_bytes);
+
+    let secp_pubkey = secp256k1::PublicKey::from_slice(&pubkey_bytes).unwrap();
+    let x_only_pubkey = XOnlyPublicKey::from(secp_pubkey);
     let tags = serde_json::to_string(&event.tags).unwrap();
 
-    let id = serde_json::json!([0, event.pubkey, event.created_at, tags, event.content]);
+    let id = serde_json::json!([0, pubkey_with_prefix, event.created_at, tags, event.content]);
     let id_string = id.to_string();
 
     let message = Message::from_hashed_data::<sha256::Hash>(id_string.as_bytes());
