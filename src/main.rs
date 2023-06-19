@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use actix::{Actor, StreamHandler};
 use actix_web::Error;
 use actix_web::{get, post, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
@@ -6,6 +8,7 @@ use secp256k1::hashes::sha256;
 use secp256k1::rand::rngs::OsRng;
 use secp256k1::schnorr::Signature;
 use secp256k1::{KeyPair, Message, Secp256k1, XOnlyPublicKey};
+mod event_data;
 mod helper;
 #[allow(warnings, unused)]
 mod prisma;
@@ -13,6 +16,7 @@ mod sign;
 mod websocket;
 
 use actix_web::web::Json;
+pub use event_data::*;
 use hex::{decode, encode};
 use prisma::event;
 use prisma::PrismaClient;
@@ -23,24 +27,6 @@ use crate::sign::{create_event_sig, verify_event_sig};
 
 pub use helper::*;
 use websocket::ws_index;
-
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct EventData {
-    pub id: String,
-    pub pubkey: String,
-    pub created_at: u128,
-    pub content: String,
-    pub tags: Vec<Vec<String>>,
-    pub sig: String,
-}
-
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct SignEventData {
-    pub secret_key: String,
-    pub content: String,
-    pub tags: Vec<Vec<String>>,
-    pub created_at: u128,
-}
 
 #[get("/")]
 async fn entry() -> impl Responder {
@@ -97,8 +83,10 @@ async fn main() -> std::io::Result<()> {
 
     println!("Client Created");
     println!("Server running at http://{}:{}", "localhost", "8000");
-    HttpServer::new(|| {
+    let data = web::Data::new(Arc::new(_client));
+    HttpServer::new(move || {
         App::new()
+            .app_data(data.clone())
             .service(echo)
             .service(
                 web::scope("/api")
@@ -114,7 +102,7 @@ async fn main() -> std::io::Result<()> {
     .await
 }
 
-pub async fn save_event(client: PrismaClient, event: EventData) -> Result<(), NewClientError> {
+pub async fn save_event(client: &PrismaClient, event: EventData) -> Result<(), NewClientError> {
     let tags = serde_json::to_string(&event.tags).unwrap();
 
     let saved_event = client
