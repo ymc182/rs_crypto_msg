@@ -12,6 +12,9 @@ use prisma::event;
 use prisma::PrismaClient;
 use prisma_client_rust::{serde_json, NewClientError};
 use serde::{Deserialize, Serialize};
+
+use crate::sign::{create_event_sig, verify_event_sig};
+mod sign;
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct EventData {
     pub id: String,
@@ -20,6 +23,14 @@ pub struct EventData {
     pub content: String,
     pub tags: Vec<Vec<String>>,
     pub sig: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct SignEventData {
+    pub secret_key: String,
+    pub content: String,
+    pub tags: Vec<Vec<String>>,
+    pub created_at: u128,
 }
 
 #[get("/")]
@@ -42,13 +53,6 @@ async fn create_event(req_body: Json<EventData>) -> impl Responder {
     HttpResponse::Ok().body("Event created")
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct SignEventData {
-    pub secret_key: String,
-    pub content: String,
-    pub tags: Vec<Vec<String>>,
-    pub created_at: u128,
-}
 #[post("/sign-event")]
 async fn sign_event(req_body: Json<SignEventData>) -> impl Responder {
     let event_data = req_body.into_inner();
@@ -115,80 +119,6 @@ pub async fn save_event(client: PrismaClient, event: EventData) -> Result<(), Ne
         .await;
     println!("Saved event: {:?}", saved_event);
     Ok(())
-}
-
-pub fn create_event_sig(
-    secret_key_hex: String,
-    content: String,
-    tags: String,
-    created_at: u128,
-) -> EventData {
-    let secp = Secp256k1::new();
-    let key_pair = KeyPair::from_seckey_str(&secp, &secret_key_hex).expect("Invalid secret key");
-    let pubkey = key_pair.public_key().to_string();
-    let tags: Vec<Vec<String>> = serde_json::from_str(&tags).unwrap();
-    let tag_string = serde_json::to_string(&tags).unwrap();
-    let id = serde_json::json!([0, pubkey, created_at, tag_string, content]);
-    let id_string = id.to_string();
-    let message = Message::from_hashed_data::<sha256::Hash>(id_string.as_bytes());
-    let id_hashed = encode(message.as_ref());
-    let sig = secp.sign_schnorr(&message, &key_pair);
-    let sig_encoded = encode(sig.as_ref());
-    return EventData {
-        id: id_hashed,
-        pubkey: pubkey[2..].to_string(), // remove 02 prefix
-        created_at,
-        content,
-        tags,
-        sig: sig_encoded,
-    };
-}
-
-pub fn verify_event_sig(event: &EventData) -> bool {
-    let secp = Secp256k1::new();
-    //check pubkey without prefix is odd or even
-
-    let original_pubkey = &event.pubkey.clone();
-
-    let is_odd = original_pubkey
-        .chars()
-        .last()
-        .unwrap()
-        .to_digit(16)
-        .unwrap()
-        % 2
-        == 1;
-    let pubkey_with_prefix: String = if is_odd {
-        "02".to_string() + &original_pubkey
-    } else {
-        "03".to_string() + &original_pubkey
-    };
-
-    println!("pubkey_with_prefix: {}", pubkey_with_prefix);
-    // println!("pubkey_str: {}", pubkey_str);
-    let pubkey_bytes = decode(&pubkey_with_prefix).expect("Failed to decode pubkey");
-    let pubkey_prefix_bytes = decode(&pubkey_with_prefix).expect("Failed to decode pubkey");
-
-    // println!("pubkey_bytes: {:?}", pubkey_bytes);
-    println!("pubkey_prefix_bytes: {:?}", pubkey_prefix_bytes);
-
-    let secp_pubkey = secp256k1::PublicKey::from_slice(&pubkey_bytes).unwrap();
-    let x_only_pubkey = XOnlyPublicKey::from(secp_pubkey);
-    let tags = serde_json::to_string(&event.tags).unwrap();
-
-    let id = serde_json::json!([0, pubkey_with_prefix, event.created_at, tags, event.content]);
-    let id_string = id.to_string();
-
-    let message = Message::from_hashed_data::<sha256::Hash>(id_string.as_bytes());
-
-    let sig_bytes = decode(&event.sig).expect("Failed to decode signature");
-    let sig = Signature::from_slice(&sig_bytes).unwrap();
-
-    let ver_result = secp.verify_schnorr(&sig, &message, &x_only_pubkey);
-    if ver_result.is_err() {
-        return false;
-    }
-    return true;
 }
 
 //impl to_string for EventData return a json compatible string
