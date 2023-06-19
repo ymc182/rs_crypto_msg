@@ -6,8 +6,12 @@ use secp256k1::hashes::sha256;
 use secp256k1::rand::rngs::OsRng;
 use secp256k1::schnorr::Signature;
 use secp256k1::{KeyPair, Message, Secp256k1, XOnlyPublicKey};
+mod helper;
 #[allow(warnings, unused)]
 mod prisma;
+mod sign;
+mod websocket;
+
 use actix_web::web::Json;
 use hex::{decode, encode};
 use prisma::event;
@@ -16,9 +20,9 @@ use prisma_client_rust::{serde_json, NewClientError};
 use serde::{Deserialize, Serialize};
 
 use crate::sign::{create_event_sig, verify_event_sig};
-mod sign;
-mod websocket;
-use crate::websocket::ws_index;
+
+pub use helper::*;
+use websocket::ws_index;
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct EventData {
