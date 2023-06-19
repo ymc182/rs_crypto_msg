@@ -9,7 +9,7 @@ COPY . .
 RUN apt-get update && apt-get install -y pkg-config libssl-dev  && rm -rf /var/lib/apt/lists/*
 
 # Build our application
-RUN cargo prisma migrate deploy
+RUN cargo prisma migrate dev --name init
 RUN cargo prisma generate 
 RUN cargo build --release
 

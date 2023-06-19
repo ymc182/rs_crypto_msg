@@ -83,7 +83,7 @@ async fn main() -> std::io::Result<()> {
         .expect("Failed to build client");
 
     println!("Client Created");
-    println!("Server running at http://{}:{}", "localhost", "8000");
+    println!("Server running at http://{}:{}", "localhost", "8080");
     let data = web::Data::new(Arc::new(_client));
     HttpServer::new(move || {
         App::new()
@@ -98,7 +98,7 @@ async fn main() -> std::io::Result<()> {
             )
             .route("/ws/", web::get().to(ws_index))
     })
-    .bind(("127.0.0.1", 8000))?
+    .bind(("0.0.0.0", 8080))?
     .run()
     .await
 }

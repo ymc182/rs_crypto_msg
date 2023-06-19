@@ -10,4 +10,4 @@ services:
     volumes:
       - .:/usr/src/rs_crypto_msg
     ports:
-      - "8000:8000"
+      - "8080:8080"
