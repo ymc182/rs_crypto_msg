@@ -146,6 +146,77 @@ pub mod event {
             }
         }
     }
+    pub mod kind {
+        use super::super::*;
+        use super::_prisma::*;
+        use super::{
+            OrderByParam, SetParam, UncheckedSetParam, UniqueWhereParam, WhereParam, WithParam,
+        };
+        pub const NAME: &str = "kind";
+        pub struct Set(pub i32);
+        impl From<Set> for SetParam {
+            fn from(Set(v): Set) -> Self {
+                Self::SetKind(v)
+            }
+        }
+        impl From<Set> for UncheckedSetParam {
+            fn from(Set(v): Set) -> Self {
+                Self::Kind(v)
+            }
+        }
+        pub fn set<T: From<Set>>(value: i32) -> T {
+            Set(value).into()
+        }
+        pub fn order(direction: ::prisma_client_rust::Direction) -> OrderByParam {
+            OrderByParam::Kind(direction)
+        }
+        pub fn equals(value: i32) -> WhereParam {
+            WhereParam::Kind(_prisma::read_filters::IntFilter::Equals(value))
+        }
+        ::prisma_client_rust::scalar_where_param_fns!(_prisma::read_filters::IntFilter, Kind, {
+            fn in_vec(_: Vec<i32>) -> InVec;
+            fn not_in_vec(_: Vec<i32>) -> NotInVec;
+            fn lt(_: i32) -> Lt;
+            fn lte(_: i32) -> Lte;
+            fn gt(_: i32) -> Gt;
+            fn gte(_: i32) -> Gte;
+            fn not(_: i32) -> Not;
+        });
+        pub fn increment(value: i32) -> SetParam {
+            SetParam::IncrementKind(value)
+        }
+        pub fn decrement(value: i32) -> SetParam {
+            SetParam::DecrementKind(value)
+        }
+        pub fn multiply(value: i32) -> SetParam {
+            SetParam::MultiplyKind(value)
+        }
+        pub fn divide(value: i32) -> SetParam {
+            SetParam::DivideKind(value)
+        }
+        pub struct Include;
+        impl Into<super::IncludeParam> for Include {
+            fn into(self) -> super::IncludeParam {
+                super::IncludeParam::Kind(self)
+            }
+        }
+        impl Include {
+            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
+                ::prisma_client_rust::sel(NAME)
+            }
+        }
+        pub struct Select;
+        impl Into<super::SelectParam> for Select {
+            fn into(self) -> super::SelectParam {
+                super::SelectParam::Kind(self)
+            }
+        }
+        impl Select {
+            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
+                ::prisma_client_rust::sel(NAME)
+            }
+        }
+    }
     pub mod created_at {
         use super::super::*;
         use super::_prisma::*;
@@ -414,31 +485,52 @@ pub mod event {
     pub fn create(
         id: String,
         pubkey: String,
+        kind: i32,
         created_at: i32,
         content: String,
         tags: String,
         sig: String,
         _params: Vec<SetParam>,
-    ) -> (String, String, i32, String, String, String, Vec<SetParam>) {
-        (id, pubkey, created_at, content, tags, sig, _params)
+    ) -> (
+        String,
+        String,
+        i32,
+        i32,
+        String,
+        String,
+        String,
+        Vec<SetParam>,
+    ) {
+        (id, pubkey, kind, created_at, content, tags, sig, _params)
     }
     pub fn create_unchecked(
         id: String,
         pubkey: String,
+        kind: i32,
         created_at: i32,
         content: String,
         tags: String,
         sig: String,
         _params: Vec<SetParam>,
-    ) -> (String, String, i32, String, String, String, Vec<SetParam>) {
-        (id, pubkey, created_at, content, tags, sig, _params)
+    ) -> (
+        String,
+        String,
+        i32,
+        i32,
+        String,
+        String,
+        String,
+        Vec<SetParam>,
+    ) {
+        (id, pubkey, kind, created_at, content, tags, sig, _params)
     }
     #[macro_export]
-    macro_rules ! _select_event { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: event :: select ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: event :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn select ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: event :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: event :: select ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: event :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: event :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { id , pubkey , created_at , content , tags , sig } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { $ (pub $ field : crate :: prisma :: event :: select ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) +] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: event :: $ field :: NAME , & self . $ field) ? ;) * state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: event :: $ field :: NAME) , + ,] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: event :: $ field :: NAME => Ok (Field :: $ field)) , * , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * while let Some (key) = map . next_key () ? { match key { $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: event :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: event :: $ field :: NAME)) ? ;) * Ok (Data { $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "pubkey" , "created_at" , "content" , "tags" , "sig"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: event :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; id) => { String } ; (@ field_type ; pubkey) => { String } ; (@ field_type ; created_at) => { i32 } ; (@ field_type ; content) => { String } ; (@ field_type ; tags) => { String } ; (@ field_type ; sig) => { String } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Event" , available relations are "id, pubkey, created_at, content, tags, sig")) } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; id) => { Into :: < crate :: prisma :: event :: SelectParam > :: into (crate :: prisma :: event :: id :: Select) } ; (@ selection_field_to_selection_param ; pubkey) => { Into :: < crate :: prisma :: event :: SelectParam > :: into (crate :: prisma :: event :: pubkey :: Select) } ; (@ selection_field_to_selection_param ; created_at) => { Into :: < crate :: prisma :: event :: SelectParam > :: into (crate :: prisma :: event :: created_at :: Select) } ; (@ selection_field_to_selection_param ; content) => { Into :: < crate :: prisma :: event :: SelectParam > :: into (crate :: prisma :: event :: content :: Select) } ; (@ selection_field_to_selection_param ; tags) => { Into :: < crate :: prisma :: event :: SelectParam > :: into (crate :: prisma :: event :: tags :: Select) } ; (@ selection_field_to_selection_param ; sig) => { Into :: < crate :: prisma :: event :: SelectParam > :: into (crate :: prisma :: event :: sig :: Select) } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: event :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; pubkey) => { "pubkey" } ; (@ field_serde_name ; created_at) => { "created_at" } ; (@ field_serde_name ; content) => { "content" } ; (@ field_serde_name ; tags) => { "tags" } ; (@ field_serde_name ; sig) => { "sig" } ; }
+    macro_rules ! _select_event { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: event :: select ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: event :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn select ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: event :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: event :: select ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: event :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: event :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { id , pubkey , kind , created_at , content , tags , sig } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { $ (pub $ field : crate :: prisma :: event :: select ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) +] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: event :: $ field :: NAME , & self . $ field) ? ;) * state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: event :: $ field :: NAME) , + ,] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: event :: $ field :: NAME => Ok (Field :: $ field)) , * , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * while let Some (key) = map . next_key () ? { match key { $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: event :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: event :: $ field :: NAME)) ? ;) * Ok (Data { $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "pubkey" , "kind" , "created_at" , "content" , "tags" , "sig"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: event :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; id) => { String } ; (@ field_type ; pubkey) => { String } ; (@ field_type ; kind) => { i32 } ; (@ field_type ; created_at) => { i32 } ; (@ field_type ; content) => { String } ; (@ field_type ; tags) => { String } ; (@ field_type ; sig) => { String } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Event" , available relations are "id, pubkey, kind, created_at, content, tags, sig")) } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; id) => { Into :: < crate :: prisma :: event :: SelectParam > :: into (crate :: prisma :: event :: id :: Select) } ; (@ selection_field_to_selection_param ; pubkey) => { Into :: < crate :: prisma :: event :: SelectParam > :: into (crate :: prisma :: event :: pubkey :: Select) } ; (@ selection_field_to_selection_param ; kind) => { Into :: < crate :: prisma :: event :: SelectParam > :: into (crate :: prisma :: event :: kind :: Select) } ; (@ selection_field_to_selection_param ; created_at) => { Into :: < crate :: prisma :: event :: SelectParam > :: into (crate :: prisma :: event :: created_at :: Select) } ; (@ selection_field_to_selection_param ; content) => { Into :: < crate :: prisma :: event :: SelectParam > :: into (crate :: prisma :: event :: content :: Select) } ; (@ selection_field_to_selection_param ; tags) => { Into :: < crate :: prisma :: event :: SelectParam > :: into (crate :: prisma :: event :: tags :: Select) } ; (@ selection_field_to_selection_param ; sig) => { Into :: < crate :: prisma :: event :: SelectParam > :: into (crate :: prisma :: event :: sig :: Select) } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: event :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; pubkey) => { "pubkey" } ; (@ field_serde_name ; kind) => { "kind" } ; (@ field_serde_name ; created_at) => { "created_at" } ; (@ field_serde_name ; content) => { "content" } ; (@ field_serde_name ; tags) => { "tags" } ; (@ field_serde_name ; sig) => { "sig" } ; }
     pub use _select_event as select;
     pub enum SelectParam {
         Id(id::Select),
         Pubkey(pubkey::Select),
+        Kind(kind::Select),
         CreatedAt(created_at::Select),
         Content(content::Select),
         Tags(tags::Select),
@@ -449,6 +541,7 @@ pub mod event {
             match self {
                 Self::Id(data) => data.to_selection(),
                 Self::Pubkey(data) => data.to_selection(),
+                Self::Kind(data) => data.to_selection(),
                 Self::CreatedAt(data) => data.to_selection(),
                 Self::Content(data) => data.to_selection(),
                 Self::Tags(data) => data.to_selection(),
@@ -457,11 +550,12 @@ pub mod event {
         }
     }
     #[macro_export]
-    macro_rules ! _include_event { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: event :: include ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: event :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn include ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: event :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: event :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: event :: include ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: event :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: event :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: event :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { pub id : String , pub pubkey : String , pub created_at : i32 , pub content : String , pub tags : String , pub sig : String , $ (pub $ field : crate :: prisma :: event :: include ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) + stringify ! (id) , stringify ! (pubkey) , stringify ! (created_at) , stringify ! (content) , stringify ! (tags) , stringify ! (sig)] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: event :: $ field :: NAME , & self . $ field) ? ;) * state . serialize_field (crate :: prisma :: event :: id :: NAME , & self . id) ? ; state . serialize_field (crate :: prisma :: event :: pubkey :: NAME , & self . pubkey) ? ; state . serialize_field (crate :: prisma :: event :: created_at :: NAME , & self . created_at) ? ; state . serialize_field (crate :: prisma :: event :: content :: NAME , & self . content) ? ; state . serialize_field (crate :: prisma :: event :: tags :: NAME , & self . tags) ? ; state . serialize_field (crate :: prisma :: event :: sig :: NAME , & self . sig) ? ; state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , id , pubkey , created_at , content , tags , sig } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: event :: $ field :: NAME) , + , crate :: prisma :: event :: id :: NAME , crate :: prisma :: event :: pubkey :: NAME , crate :: prisma :: event :: created_at :: NAME , crate :: prisma :: event :: content :: NAME , crate :: prisma :: event :: tags :: NAME , crate :: prisma :: event :: sig :: NAME] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: event :: $ field :: NAME => Ok (Field :: $ field)) , * , crate :: prisma :: event :: id :: NAME => Ok (Field :: id) , crate :: prisma :: event :: pubkey :: NAME => Ok (Field :: pubkey) , crate :: prisma :: event :: created_at :: NAME => Ok (Field :: created_at) , crate :: prisma :: event :: content :: NAME => Ok (Field :: content) , crate :: prisma :: event :: tags :: NAME => Ok (Field :: tags) , crate :: prisma :: event :: sig :: NAME => Ok (Field :: sig) , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * let mut id = None ; let mut pubkey = None ; let mut created_at = None ; let mut content = None ; let mut tags = None ; let mut sig = None ; while let Some (key) = map . next_key () ? { match key { Field :: id => { if id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: event :: id :: NAME)) ; } id = Some (map . next_value () ?) ; } Field :: pubkey => { if pubkey . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: event :: pubkey :: NAME)) ; } pubkey = Some (map . next_value () ?) ; } Field :: created_at => { if created_at . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: event :: created_at :: NAME)) ; } created_at = Some (map . next_value () ?) ; } Field :: content => { if content . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: event :: content :: NAME)) ; } content = Some (map . next_value () ?) ; } Field :: tags => { if tags . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: event :: tags :: NAME)) ; } tags = Some (map . next_value () ?) ; } Field :: sig => { if sig . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: event :: sig :: NAME)) ; } sig = Some (map . next_value () ?) ; } $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: event :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: event :: $ field :: NAME)) ? ;) * let id = id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: event :: id :: NAME)) ? ; let pubkey = pubkey . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: event :: pubkey :: NAME)) ? ; let created_at = created_at . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: event :: created_at :: NAME)) ? ; let content = content . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: event :: content :: NAME)) ? ; let tags = tags . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: event :: tags :: NAME)) ? ; let sig = sig . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: event :: sig :: NAME)) ? ; Ok (Data { id , pubkey , created_at , content , tags , sig , $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "pubkey" , "created_at" , "content" , "tags" , "sig"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: event :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Event" , available relations are "")) } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: event :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; pubkey) => { "pubkey" } ; (@ field_serde_name ; created_at) => { "created_at" } ; (@ field_serde_name ; content) => { "content" } ; (@ field_serde_name ; tags) => { "tags" } ; (@ field_serde_name ; sig) => { "sig" } ; }
+    macro_rules ! _include_event { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: event :: include ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: event :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn include ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: event :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: event :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: event :: include ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: event :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: event :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: event :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { pub id : String , pub pubkey : String , pub kind : i32 , pub created_at : i32 , pub content : String , pub tags : String , pub sig : String , $ (pub $ field : crate :: prisma :: event :: include ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) + stringify ! (id) , stringify ! (pubkey) , stringify ! (kind) , stringify ! (created_at) , stringify ! (content) , stringify ! (tags) , stringify ! (sig)] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: event :: $ field :: NAME , & self . $ field) ? ;) * state . serialize_field (crate :: prisma :: event :: id :: NAME , & self . id) ? ; state . serialize_field (crate :: prisma :: event :: pubkey :: NAME , & self . pubkey) ? ; state . serialize_field (crate :: prisma :: event :: kind :: NAME , & self . kind) ? ; state . serialize_field (crate :: prisma :: event :: created_at :: NAME , & self . created_at) ? ; state . serialize_field (crate :: prisma :: event :: content :: NAME , & self . content) ? ; state . serialize_field (crate :: prisma :: event :: tags :: NAME , & self . tags) ? ; state . serialize_field (crate :: prisma :: event :: sig :: NAME , & self . sig) ? ; state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , id , pubkey , kind , created_at , content , tags , sig } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: event :: $ field :: NAME) , + , crate :: prisma :: event :: id :: NAME , crate :: prisma :: event :: pubkey :: NAME , crate :: prisma :: event :: kind :: NAME , crate :: prisma :: event :: created_at :: NAME , crate :: prisma :: event :: content :: NAME , crate :: prisma :: event :: tags :: NAME , crate :: prisma :: event :: sig :: NAME] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: event :: $ field :: NAME => Ok (Field :: $ field)) , * , crate :: prisma :: event :: id :: NAME => Ok (Field :: id) , crate :: prisma :: event :: pubkey :: NAME => Ok (Field :: pubkey) , crate :: prisma :: event :: kind :: NAME => Ok (Field :: kind) , crate :: prisma :: event :: created_at :: NAME => Ok (Field :: created_at) , crate :: prisma :: event :: content :: NAME => Ok (Field :: content) , crate :: prisma :: event :: tags :: NAME => Ok (Field :: tags) , crate :: prisma :: event :: sig :: NAME => Ok (Field :: sig) , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * let mut id = None ; let mut pubkey = None ; let mut kind = None ; let mut created_at = None ; let mut content = None ; let mut tags = None ; let mut sig = None ; while let Some (key) = map . next_key () ? { match key { Field :: id => { if id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: event :: id :: NAME)) ; } id = Some (map . next_value () ?) ; } Field :: pubkey => { if pubkey . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: event :: pubkey :: NAME)) ; } pubkey = Some (map . next_value () ?) ; } Field :: kind => { if kind . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: event :: kind :: NAME)) ; } kind = Some (map . next_value () ?) ; } Field :: created_at => { if created_at . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: event :: created_at :: NAME)) ; } created_at = Some (map . next_value () ?) ; } Field :: content => { if content . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: event :: content :: NAME)) ; } content = Some (map . next_value () ?) ; } Field :: tags => { if tags . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: event :: tags :: NAME)) ; } tags = Some (map . next_value () ?) ; } Field :: sig => { if sig . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: event :: sig :: NAME)) ; } sig = Some (map . next_value () ?) ; } $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: event :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: event :: $ field :: NAME)) ? ;) * let id = id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: event :: id :: NAME)) ? ; let pubkey = pubkey . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: event :: pubkey :: NAME)) ? ; let kind = kind . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: event :: kind :: NAME)) ? ; let created_at = created_at . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: event :: created_at :: NAME)) ? ; let content = content . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: event :: content :: NAME)) ? ; let tags = tags . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: event :: tags :: NAME)) ? ; let sig = sig . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: event :: sig :: NAME)) ? ; Ok (Data { id , pubkey , kind , created_at , content , tags , sig , $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "pubkey" , "kind" , "created_at" , "content" , "tags" , "sig"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: event :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Event" , available relations are "")) } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: event :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; pubkey) => { "pubkey" } ; (@ field_serde_name ; kind) => { "kind" } ; (@ field_serde_name ; created_at) => { "created_at" } ; (@ field_serde_name ; content) => { "content" } ; (@ field_serde_name ; tags) => { "tags" } ; (@ field_serde_name ; sig) => { "sig" } ; }
     pub use _include_event as include;
     pub enum IncludeParam {
         Id(id::Include),
         Pubkey(pubkey::Include),
+        Kind(kind::Include),
         CreatedAt(created_at::Include),
         Content(content::Include),
         Tags(tags::Include),
@@ -472,6 +566,7 @@ pub mod event {
             match self {
                 Self::Id(data) => data.to_selection(),
                 Self::Pubkey(data) => data.to_selection(),
+                Self::Kind(data) => data.to_selection(),
                 Self::CreatedAt(data) => data.to_selection(),
                 Self::Content(data) => data.to_selection(),
                 Self::Tags(data) => data.to_selection(),
@@ -480,7 +575,7 @@ pub mod event {
         }
     }
     #[macro_export]
-    macro_rules ! _partial_unchecked_event { ($ struct_name : ident { $ ($ scalar_field : ident) + }) => { :: prisma_client_rust :: macros :: partial_unchecked ! { crate :: prisma :: event struct $ struct_name { # [serde (rename = "id")] pub id : String , # [serde (rename = "pubkey")] pub pubkey : String , # [serde (rename = "created_at")] pub created_at : i32 , # [serde (rename = "content")] pub content : String , # [serde (rename = "tags")] pub tags : String , # [serde (rename = "sig")] pub sig : String } [$ ($ scalar_field) , +] } } ; }
+    macro_rules ! _partial_unchecked_event { ($ struct_name : ident { $ ($ scalar_field : ident) + }) => { :: prisma_client_rust :: macros :: partial_unchecked ! { crate :: prisma :: event struct $ struct_name { # [serde (rename = "id")] pub id : String , # [serde (rename = "pubkey")] pub pubkey : String , # [serde (rename = "kind")] pub kind : i32 , # [serde (rename = "created_at")] pub created_at : i32 , # [serde (rename = "content")] pub content : String , # [serde (rename = "tags")] pub tags : String , # [serde (rename = "sig")] pub sig : String } [$ ($ scalar_field) , +] } } ; }
     pub use _partial_unchecked_event as partial_unchecked;
     #[derive(Debug, Clone, :: serde :: Serialize, :: serde :: Deserialize)]
     pub struct Data {
@@ -488,6 +583,8 @@ pub mod event {
         pub id: String,
         #[serde(rename = "pubkey")]
         pub pubkey: String,
+        #[serde(rename = "kind")]
+        pub kind: i32,
         #[serde(rename = "created_at")]
         pub created_at: i32,
         #[serde(rename = "content")]
@@ -509,6 +606,11 @@ pub mod event {
     pub enum SetParam {
         SetId(String),
         SetPubkey(String),
+        SetKind(i32),
+        IncrementKind(i32),
+        DecrementKind(i32),
+        MultiplyKind(i32),
+        DivideKind(i32),
         SetCreatedAt(i32),
         IncrementCreatedAt(i32),
         DecrementCreatedAt(i32),
@@ -528,6 +630,38 @@ pub mod event {
                 SetParam::SetPubkey(value) => (
                     pubkey::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::String(value),
+                ),
+                SetParam::SetKind(value) => (
+                    kind::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::Int(value as i64),
+                ),
+                SetParam::IncrementKind(value) => (
+                    kind::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::Object(vec![(
+                        "increment".to_string(),
+                        ::prisma_client_rust::PrismaValue::Int(value as i64),
+                    )]),
+                ),
+                SetParam::DecrementKind(value) => (
+                    kind::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::Object(vec![(
+                        "decrement".to_string(),
+                        ::prisma_client_rust::PrismaValue::Int(value as i64),
+                    )]),
+                ),
+                SetParam::MultiplyKind(value) => (
+                    kind::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::Object(vec![(
+                        "multiply".to_string(),
+                        ::prisma_client_rust::PrismaValue::Int(value as i64),
+                    )]),
+                ),
+                SetParam::DivideKind(value) => (
+                    kind::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::Object(vec![(
+                        "divide".to_string(),
+                        ::prisma_client_rust::PrismaValue::Int(value as i64),
+                    )]),
                 ),
                 SetParam::SetCreatedAt(value) => (
                     created_at::NAME.to_string(),
@@ -580,6 +714,7 @@ pub mod event {
     pub enum UncheckedSetParam {
         Id(String),
         Pubkey(String),
+        Kind(i32),
         CreatedAt(i32),
         Content(String),
         Tags(String),
@@ -590,6 +725,7 @@ pub mod event {
             match param {
                 UncheckedSetParam::Id(value) => Self::SetId(value),
                 UncheckedSetParam::Pubkey(value) => Self::SetPubkey(value),
+                UncheckedSetParam::Kind(value) => Self::SetKind(value),
                 UncheckedSetParam::CreatedAt(value) => Self::SetCreatedAt(value),
                 UncheckedSetParam::Content(value) => Self::SetContent(value),
                 UncheckedSetParam::Tags(value) => Self::SetTags(value),
@@ -601,6 +737,7 @@ pub mod event {
     pub enum OrderByParam {
         Id(::prisma_client_rust::Direction),
         Pubkey(::prisma_client_rust::Direction),
+        Kind(::prisma_client_rust::Direction),
         CreatedAt(::prisma_client_rust::Direction),
         Content(::prisma_client_rust::Direction),
         Tags(::prisma_client_rust::Direction),
@@ -615,6 +752,10 @@ pub mod event {
                 ),
                 Self::Pubkey(direction) => (
                     pubkey::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::String(direction.to_string()),
+                ),
+                Self::Kind(direction) => (
+                    kind::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::String(direction.to_string()),
                 ),
                 Self::CreatedAt(direction) => (
@@ -643,6 +784,7 @@ pub mod event {
         And(Vec<WhereParam>),
         Id(_prisma::read_filters::StringFilter),
         Pubkey(_prisma::read_filters::StringFilter),
+        Kind(_prisma::read_filters::IntFilter),
         CreatedAt(_prisma::read_filters::IntFilter),
         Content(_prisma::read_filters::StringFilter),
         Tags(_prisma::read_filters::StringFilter),
@@ -689,6 +831,7 @@ pub mod event {
                 ),
                 Self::Id(value) => (id::NAME, value.into()),
                 Self::Pubkey(value) => (pubkey::NAME, value.into()),
+                Self::Kind(value) => (kind::NAME, value.into()),
                 Self::CreatedAt(value) => (created_at::NAME, value.into()),
                 Self::Content(value) => (content::NAME, value.into()),
                 Self::Tags(value) => (tags::NAME, value.into()),
@@ -734,6 +877,7 @@ pub mod event {
             vec![
                 ::prisma_client_rust::sel(id::NAME),
                 ::prisma_client_rust::sel(pubkey::NAME),
+                ::prisma_client_rust::sel(kind::NAME),
                 ::prisma_client_rust::sel(created_at::NAME),
                 ::prisma_client_rust::sel(content::NAME),
                 ::prisma_client_rust::sel(tags::NAME),
@@ -772,6 +916,7 @@ pub mod event {
             self,
             id: String,
             pubkey: String,
+            kind: i32,
             created_at: i32,
             content: String,
             tags: String,
@@ -781,6 +926,7 @@ pub mod event {
             _params.extend([
                 id::set(id),
                 pubkey::set(pubkey),
+                kind::set(kind),
                 created_at::set(created_at),
                 content::set(content),
                 tags::set(tags),
@@ -792,6 +938,7 @@ pub mod event {
             self,
             id: String,
             pubkey: String,
+            kind: i32,
             created_at: i32,
             content: String,
             tags: String,
@@ -801,6 +948,7 @@ pub mod event {
             _params.extend([
                 id::set(id),
                 pubkey::set(pubkey),
+                kind::set(kind),
                 created_at::set(created_at),
                 content::set(content),
                 tags::set(tags),
@@ -833,9 +981,10 @@ pub mod event {
         pub fn upsert(
             self,
             _where: UniqueWhereParam,
-            (id, pubkey, created_at, content, tags, sig, mut _params): (
+            (id, pubkey, kind, created_at, content, tags, sig, mut _params): (
                 String,
                 String,
+                i32,
                 i32,
                 String,
                 String,
@@ -847,6 +996,7 @@ pub mod event {
             _params.extend([
                 id::set(id),
                 pubkey::set(pubkey),
+                kind::set(kind),
                 created_at::set(created_at),
                 content::set(content),
                 tags::set(tags),
@@ -959,6 +1109,8 @@ pub mod _prisma {
         Id,
         #[serde(rename = "pubkey")]
         Pubkey,
+        #[serde(rename = "kind")]
+        Kind,
         #[serde(rename = "created_at")]
         CreatedAt,
         #[serde(rename = "content")]
@@ -973,6 +1125,7 @@ pub mod _prisma {
             match self {
                 Self::Id => "id".to_string(),
                 Self::Pubkey => "pubkey".to_string(),
+                Self::Kind => "kind".to_string(),
                 Self::CreatedAt => "created_at".to_string(),
                 Self::Content => "content".to_string(),
                 Self::Tags => "tags".to_string(),

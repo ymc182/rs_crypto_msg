@@ -3,6 +3,7 @@ use crate::*;
 pub fn create_event_sig(
     secret_key_hex: String,
     content: String,
+    kind: u128,
     tags: String,
     created_at: u128,
 ) -> EventData {
@@ -11,7 +12,7 @@ pub fn create_event_sig(
     let pubkey = key_pair.public_key().to_string();
     let tags: Vec<Vec<String>> = serde_json::from_str(&tags).unwrap();
     let tag_string = serde_json::to_string(&tags).unwrap();
-    let id = serde_json::json!([0, pubkey, created_at, tag_string, content]);
+    let id = serde_json::json!([0, pubkey, created_at, kind, tag_string, content]);
     let id_string = id.to_string();
     let message = Message::from_hashed_data::<sha256::Hash>(id_string.as_bytes());
     let id_hashed = encode(message.as_ref());
@@ -21,6 +22,7 @@ pub fn create_event_sig(
         id: id_hashed,
         pubkey: pubkey[2..].to_string(), // remove 02 prefix
         created_at,
+        kind,
         content,
         tags,
         sig: sig_encoded,
@@ -59,7 +61,14 @@ pub fn verify_event_sig(event: &EventData) -> bool {
     let x_only_pubkey = XOnlyPublicKey::from(secp_pubkey);
     let tags = serde_json::to_string(&event.tags).unwrap();
 
-    let id = serde_json::json!([0, pubkey_with_prefix, event.created_at, tags, event.content]);
+    let id = serde_json::json!([
+        0,
+        pubkey_with_prefix,
+        event.created_at,
+        event.kind,
+        tags,
+        event.content
+    ]);
     let id_string = id.to_string();
 
     let message = Message::from_hashed_data::<sha256::Hash>(id_string.as_bytes());

@@ -54,6 +54,7 @@ async fn sign_event(req_body: Json<SignEventData>) -> impl Responder {
     let event = create_event_sig(
         event_data.secret_key,
         event_data.content,
+        event_data.kind,
         serde_json::to_string(&event_data.tags).unwrap(),
         event_data.created_at,
     );
@@ -113,6 +114,7 @@ pub async fn save_event(
         .create(
             event.id,
             event.pubkey,
+            event.kind.try_into().unwrap(),
             event.created_at.try_into().unwrap(),
             event.content,
             tags,
@@ -155,8 +157,9 @@ mod tests {
         let content = "test content".to_string();
         let tags = "[[\"test\", \"tag\"], [\"test2\", \"tag2\"]]".to_string();
         let created_at = 12345;
-        let event = create_event_sig(secret_key_hex, content, tags, created_at);
-        assert_eq!(event.pubkey, public_key.to_string());
+        let kind = 1;
+        let event = create_event_sig(secret_key_hex, content, kind, tags, created_at);
+        assert_eq!(event.pubkey, public_key.to_string()[2..].to_string());
         assert_eq!(event.content, "test content".to_string());
         assert_eq!(
             event.tags,
@@ -177,7 +180,8 @@ mod tests {
         let content = "test content".to_string();
         let tags = "[[\"test\", \"tag\"], [\"test2\", \"tag2\"]]".to_string();
         let created_at = 12345;
-        let event = create_event_sig(secret_key_hex, content, tags, created_at);
+        let kind = 1;
+        let event = create_event_sig(secret_key_hex, content, kind, tags, created_at);
         let result = verify_event_sig(&event);
         assert_eq!(result, true);
     }

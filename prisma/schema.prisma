@@ -13,6 +13,7 @@ datasource db {
 model Event {
   id         String @id
   pubkey     String
+  kind       Int
   created_at Int
   content    String
   tags       String
