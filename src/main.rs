@@ -1,9 +1,11 @@
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use actix::{Actor, StreamHandler};
+use actix_web::Error;
+use actix_web::{get, post, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
+use actix_web_actors::ws;
 use secp256k1::hashes::sha256;
 use secp256k1::rand::rngs::OsRng;
 use secp256k1::schnorr::Signature;
 use secp256k1::{KeyPair, Message, Secp256k1, XOnlyPublicKey};
-
 #[allow(warnings, unused)]
 mod prisma;
 use actix_web::web::Json;
@@ -15,6 +17,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::sign::{create_event_sig, verify_event_sig};
 mod sign;
+mod websocket;
+use crate::websocket::ws_index;
+
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct EventData {
     pub id: String,
@@ -34,7 +39,7 @@ pub struct SignEventData {
 }
 
 #[get("/")]
-async fn hello() -> impl Responder {
+async fn entry() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
 }
 
@@ -87,16 +92,20 @@ async fn main() -> std::io::Result<()> {
         .expect("Failed to build client");
 
     println!("Client Created");
-    println!("Server running at http://{}:{}", "localhost", "8080");
+    println!("Server running at http://{}:{}", "localhost", "8000");
     HttpServer::new(|| {
-        App::new().service(hello).service(echo).service(
-            web::scope("/api")
-                .service(create_event)
-                .service(create_key_pair)
-                .service(sign_event),
-        )
+        App::new()
+            .service(echo)
+            .service(
+                web::scope("/api")
+                    .service(create_event)
+                    .service(create_key_pair)
+                    .service(sign_event)
+                    .service(entry),
+            )
+            .route("/ws/", web::get().to(ws_index))
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(("127.0.0.1", 8000))?
     .run()
     .await
 }
