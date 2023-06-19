@@ -19,10 +19,12 @@ pub struct EventData {
 
 #[tokio::main]
 async fn main() {
-    let client: PrismaClient = PrismaClient::_builder()
+    let _client: PrismaClient = PrismaClient::_builder()
         .build()
         .await
         .expect("Failed to build client");
+
+    println!("Client Created");
 }
 
 pub async fn save_event(client: PrismaClient, event: EventData) -> Result<(), NewClientError> {
