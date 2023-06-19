@@ -42,12 +42,32 @@ async fn create_event(req_body: Json<EventData>) -> impl Responder {
     HttpResponse::Ok().body("Event created")
 }
 
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct SignEventData {
+    pub secret_key: String,
+    pub content: String,
+    pub tags: Vec<Vec<String>>,
+    pub created_at: u128,
+}
+#[post("/sign-event")]
+async fn sign_event(req_body: Json<SignEventData>) -> impl Responder {
+    let event_data = req_body.into_inner();
+    let event = create_event_sig(
+        event_data.secret_key,
+        event_data.content,
+        serde_json::to_string(&event_data.tags).unwrap(),
+        event_data.created_at,
+    );
+
+    HttpResponse::Ok().body(serde_json::to_string(&event).unwrap())
+}
+
 #[get("/key-pair")]
 async fn create_key_pair() -> impl Responder {
     let secp = Secp256k1::new();
     let (secret_key, public_key) = secp.generate_keypair(&mut OsRng);
     let secret_key_hex = secret_key.display_secret().to_string();
-    let public_key_hex = public_key.to_string()[2..].to_string();
+    let public_key_hex = public_key.to_string();
     let key_pair = serde_json::json!({
             "secret_key": secret_key_hex,
             "public_key": public_key_hex,
@@ -68,7 +88,8 @@ async fn main() -> std::io::Result<()> {
         App::new().service(hello).service(echo).service(
             web::scope("/api")
                 .service(create_event)
-                .service(create_key_pair),
+                .service(create_key_pair)
+                .service(sign_event),
         )
     })
     .bind(("127.0.0.1", 8080))?
@@ -126,7 +147,7 @@ pub fn create_event_sig(
 pub fn verify_event_sig(event: &EventData) -> bool {
     let secp = Secp256k1::new();
 
-    let pubkey_str = "02".to_string() + &event.pubkey.clone();
+    let pubkey_str = &event.pubkey.clone();
     let pubkey_bytes = decode(&pubkey_str).expect("Failed to decode pubkey");
     let pubkey = secp256k1::PublicKey::from_slice(&pubkey_bytes).unwrap();
     let x_only_pubkey = XOnlyPublicKey::from(pubkey);
